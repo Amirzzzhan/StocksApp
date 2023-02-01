@@ -1,0 +1,6 @@
+framework module svgnative {
+  umbrella header "svgnative-umbrella.h"
+
+  export *
+  module * { export * }
+}

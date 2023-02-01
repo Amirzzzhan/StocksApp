@@ -1,0 +1,6 @@
+framework module SDWebImageSVGNativeCoder {
+  umbrella header "SDWebImageSVGNativeCoder-umbrella.h"
+
+  export *
+  module * { export * }
+}

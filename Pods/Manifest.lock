@@ -1,16 +1,30 @@
 PODS:
   - Alamofire (5.6.4)
+  - SDWebImage (5.14.0):
+    - SDWebImage/Core (= 5.14.0)
+  - SDWebImage/Core (5.14.0)
+  - SDWebImageSVGNativeCoder (0.1.1):
+    - SDWebImage (~> 5.10)
+    - svgnative (>= 0.1.0-beta)
+  - svgnative (0.1.0-beta)
 
 DEPENDENCIES:
   - Alamofire
+  - SDWebImageSVGNativeCoder
 
 SPEC REPOS:
   trunk:
     - Alamofire
+    - SDWebImage
+    - SDWebImageSVGNativeCoder
+    - svgnative
 
 SPEC CHECKSUMS:
   Alamofire: 4e95d97098eacb88856099c4fc79b526a299e48c
+  SDWebImage: 9e391cf38577742f501055dca17e4987f6713fe1
+  SDWebImageSVGNativeCoder: dae205bb67b523328e5b87d6ff22d6c640e594c0
+  svgnative: 50a6b71a4e4c161f0352d888afe21e94affd3b42
 
-PODFILE CHECKSUM: 49dc1f727e332980acad59ce716df9193f5bb77b
+PODFILE CHECKSUM: 95056ff68bae33d16db29165c6416ef950b6ac13
 
 COCOAPODS: 1.11.3

@@ -1,0 +1,167 @@
+version: 2.1
+
+orbs:
+  windows: circleci/windows@2.3.0
+
+jobs:
+  build_test:
+    docker:
+      - image: debian:stretch
+    steps:
+      - run:
+          name: Installing sudo
+          command: 'apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*'
+      - run:
+          name: Installing Build System
+          command: 'apt-get update && apt-get install -y git build-essential python2.7 libxml2-dev'
+      - run:
+          name: Installing Build System
+          command: 'apt-get update && apt-get install wget -y && apt-get install zlib1g-dev -y && apt-get install libcurl4-openssl-dev -y && wget https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz && tar -zxvf cmake-3.15.2.tar.gz && cd cmake-3.15.2 && ./bootstrap --system-curl && make && sudo make install && cd - && rm -rf cmake-3.15.2*'
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - run:
+          name: Creating Build Files
+          command: 'cd svgnative && cmake -Bbuild/linux -H.'
+      - run:
+          name: Creating Binary Files
+          command: 'cd svgnative && cmake --build build/linux'
+      - run:
+          name: Run Tests
+          command: 'cd svgnative && /usr/bin/python2.7 script/runTest.py --test=test'
+      - run:
+          name: Creating Build Files With libxml2
+          command: 'cd svgnative && cmake -Bbuild/linux-libxml2 -H. -DPLATFORM_XML=ON'
+      - run:
+          name: Creating Binary Files With libxml2
+          command: 'cd svgnative && cmake --build build/linux-libxml2'
+      - run:
+          name: Run Tests With libxml2
+          command: 'cd svgnative && /usr/bin/python2.7 script/runTest.py --test=test --program=build/linux-libxml2/example/testText/testSVGNative'
+  build_with_clang:
+    docker:
+      - image: debian:stretch
+    steps:
+      - run:
+          name: Installing sudo
+          command: 'apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*'
+      - run:
+          name: Installing Build System
+          command: 'apt-get update && apt-get install -y git build-essential clang++-11 python2.7'
+      - run:
+          name: Installing Build System
+          command: 'apt-get update && apt-get install wget -y && apt-get install zlib1g-dev -y && apt-get install libcurl4-openssl-dev -y && wget https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz && tar -zxvf cmake-3.15.2.tar.gz && cd cmake-3.15.2 && ./bootstrap --system-curl && make && sudo make install && cd - && rm -rf cmake-3.15.2*'
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - run:
+          name: Creating Build Files
+          command: 'cd svgnative && cmake -Bbuild/linux -H. -DCMAKE_CXX_COMPILER=clang++-11 -DLIB_ONLY=ON'
+      - run:
+          name: Creating Binary Files
+          command: 'cd svgnative && cmake --build build/linux'
+  build_with_style_support:
+    docker:
+      - image: debian:stretch
+    steps:
+      - run:
+          name: Installing sudo
+          command: 'apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*'
+      - run:
+          name: Installing Build System
+          command: 'apt-get update && apt-get install -y git build-essential libboost-system-dev python2.7'
+      - run:
+          name: Installing Build System
+          command: 'apt-get update && apt-get install wget -y && apt-get install zlib1g-dev -y && apt-get install libcurl4-openssl-dev -y && wget https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz && tar -zxvf cmake-3.15.2.tar.gz && cd cmake-3.15.2 && ./bootstrap --system-curl && make && sudo make install && cd - && rm -rf cmake-3.15.2*'
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - run:
+          name: Creating Build Files
+          command: 'cd svgnative && cmake -Bbuild/linux -H. -DSTYLE=ON'
+      - run:
+          name: Creating Binary Files
+          command: 'cd svgnative && cmake --build build/linux'
+  build_with_cocoa:
+    macos:
+      xcode: "10.3.0"
+    steps:
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - run:
+          name: Installing dependencies
+          command: HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew install cmake
+      - run:
+          name: Creating Build Files
+          command: 'cd svgnative && cmake -Bbuild/mac -H. -DCG=ON'
+      - run:
+          name: Creating Binary Files
+          command: 'cd svgnative && cmake --build build/mac'
+  build_with_gdi_d2d:
+    executor: windows/default
+    steps:
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - run:
+          name: Installing CMake
+          command: |
+            $global:ProgressPreference = 'SilentlyContinue'
+            $cmakeVersion = "3.16.2"
+            $url = "https://github.com/Kitware/CMake/releases/download/v" + $cmakeVersion + "/cmake-" + $cmakeVersion + "-win64-x64.zip"
+            $outputDir = (Get-Item -Path ".\").FullName
+            $outputZip = $outputDir + "\cmake.zip"
+            (New-Object System.Net.WebClient).DownloadFile($url, $outputZip)
+            Expand-Archive -LiteralPath $outputZip -DestinationPath $outputDir -Force
+      - run:
+          name: Creating Build Files - GDI+
+          command: |
+            $cmakeVersion = "3.16.2"
+            $env:Path += ";" + (Get-Item -Path ".\").FullName + "\cmake-" + $cmakeVersion + "-win64-x64\bin"
+            cd .\svgnative
+            cmake -Bbuild/win . -G "Visual Studio 16 2019" -DGDIPLUS=ON
+      - run:
+          name: Creating Binary Files - GDI+
+          command: |
+            $cmakeVersion = "3.16.2"
+            $env:Path += ";" + (Get-Item -Path ".\").FullName + "\cmake-" + $cmakeVersion + "-win64-x64\bin"
+            cd .\svgnative
+            cmake --build build/win
+      - run:
+          name: Creating Build Files - Direct2D
+          command: |
+            $cmakeVersion = "3.16.2"
+            $env:Path += ";" + (Get-Item -Path ".\").FullName + "\cmake-" + $cmakeVersion + "-win64-x64\bin"
+            cd .\svgnative
+            cmake -Bbuild/win-d2d . -G "Visual Studio 16 2019" -DD2D=ON
+      - run:
+          name: Creating Binary Files - Direct2D
+          command: |
+            $cmakeVersion = "3.16.2"
+            $env:Path += ";" + (Get-Item -Path ".\").FullName + "\cmake-" + $cmakeVersion + "-win64-x64\bin"
+            cd .\svgnative
+            cmake --build build/win-d2d
+      - run:
+          name: Creating Build Files - Shared Lib
+          command: |
+            $cmakeVersion = "3.16.2"
+            $env:Path += ";" + (Get-Item -Path ".\").FullName + "\cmake-" + $cmakeVersion + "-win64-x64\bin"
+            cd .\svgnative
+            cmake -Bbuild/win-shared . -G "Visual Studio 16 2019" -DGDIPLUS=ON -DSHARED=ON
+      - run:
+          name: Creating Binary Files - Shared Lib
+          command: |
+            $cmakeVersion = "3.16.2"
+            $env:Path += ";" + (Get-Item -Path ".\").FullName + "\cmake-" + $cmakeVersion + "-win64-x64\bin"
+            cd .\svgnative
+            cmake --build build/win-shared
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build_test
+      - build_with_style_support
+      - build_with_clang
+      - build_with_cocoa
+      - build_with_gdi_d2d

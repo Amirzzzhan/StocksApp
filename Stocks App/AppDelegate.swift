@@ -7,14 +7,19 @@
 
 import UIKit
 import CoreData
+import SDWebImageSVGNativeCoder
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
+    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        let SVGCoder = SDImageSVGNativeCoder.shared
+        SDImageCodersManager.shared.addCoder(SVGCoder)
+        
         return true
     }
 

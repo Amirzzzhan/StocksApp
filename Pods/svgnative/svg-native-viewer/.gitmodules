@@ -1,0 +1,11 @@
+[submodule "third_party/stylesheet"]
+	path = third_party/stylesheet
+	url = https://github.com/adobe/stylesheet.git
+	branch = modifications
+[submodule "third_party/cpp-base64"]
+	path = third_party/cpp-base64
+	url = https://github.com/ReneNyffenegger/cpp-base64.git
+[submodule "third_party/boost_variant_property_tree"]
+	path = third_party/boost_variant_property_tree
+	url = https://github.com/dirkschulze/boost_variant_property_tree.git
+	branch = v1_65_1

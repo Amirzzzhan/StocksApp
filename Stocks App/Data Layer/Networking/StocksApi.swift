@@ -22,8 +22,9 @@ final class StocksApi: StocksApiLogic {
     }
     
     func getCompanyStock(ticker: String, completion: @escaping StocksApiResponce) {
-        let stock = Stock()
-        var errFound = false
+        let stock = Stock(context: CoreDataManager.shared.viewContext)
+        stock.isFavourite = false
+        var err: Error?
         
         let dispatchGroup = DispatchGroup()
         
@@ -36,7 +37,7 @@ final class StocksApi: StocksApiLogic {
                     switch response.result {
                     case .failure(let error):
                         print(error)
-                        errFound = true
+                        err = error
                     case .success(let companyProfile):
                         stock.ticker = companyProfile.ticker
                         stock.logo = companyProfile.logo
@@ -57,7 +58,7 @@ final class StocksApi: StocksApiLogic {
                     switch response.result {
                     case .failure(let error):
                         print(error)
-                        errFound = true
+                        err = error
                     case .success(let companyQuote):
                         stock.currentPrice = companyQuote.c
                         stock.priceChange = companyQuote.d
@@ -69,7 +70,12 @@ final class StocksApi: StocksApiLogic {
             }
         
         dispatchGroup.notify(queue: .main) {
-            errFound ? completion(nil) : completion(stock)
+            CoreDataManager.shared.addStock(stock: stock)
+            if let err = err {
+                fatalError(err.localizedDescription)
+            } else {
+                completion(stock)
+            }
         }
     }
 }
