@@ -9,10 +9,16 @@ import Foundation
 import Combine
 import UIKit
 
+protocol SearchHistoryViewProtocol: AnyObject {
+    func didTapOnButton(text: String)
+}
+
 final class SearchHistoryView: UIView {
+
+    weak var delegate: SearchHistoryViewProtocol?
     
-    private var searchedCompanies: [String]?
-    @Published private(set) var searchedCompany: String = ""
+    private var viewTitle: String = ""
+    private var searchedCompanies: [String?] = []
     
     private let label: UILabel = {
         let label = UILabel()
@@ -69,53 +75,66 @@ final class SearchHistoryView: UIView {
         return stack
     }()
     
-    convenience init(searchedCompanies: [String], viewTitle: String) {
+    convenience init(viewTitle: String) {
         self.init(frame: .zero)
-        self.searchedCompanies = searchedCompanies
+        self.viewTitle = viewTitle
         
         setupView()
         setupConstraints()
         setLabelTitle(text: viewTitle)
+        setupStacks()
+    }
+    
+    
+    public func addToStack() {
         
+        verticalStack.removeFullyAllArrangedSubviews()
+        firstStack.removeFullyAllArrangedSubviews()
+        secondStack.removeFullyAllArrangedSubviews()
         
-        let arr = ["Apple", "Amazon", "First Solar", "Tesla", "Apple", "AmazonASFASFAS", "Google"]
+        setupStacks()
+    }
+    
+    private func setupStacks() {
         
-        for i in arr {
-            let butt = UIButton(configuration: UIButton.Configuration.outline())
-            
-            butt.addTarget(self, action: #selector(tickerButtonPressed), for: .touchUpInside)
-            
-            if let font = UIFont(name: "Montserrat-SemiBold", size: 15) {
-                butt.setAttributedTitle(NSAttributedString(string: i, attributes: [NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: font]), for: .normal)
-            }
-            
-            butt.heightAnchor.constraint(equalToConstant: 50).isActive = true
-            
-            firstStack.addArrangedSubview(butt)
-            
+        if viewTitle == "You’ve searched for this" {
+            searchedCompanies = CoreDataManager.shared.getSearchedTexts().map { $0.text }
+        } else {
+            searchedCompanies = ["Apple", "Amazon", "First Solar", "Tesla", "Intel", "AMD", "Google",
+                       "Meta", "Alibaba", "Facebook", "Yandex", "Visa", "GM", "Nokia"]
         }
         
-        let arr1 = ["First Solar", "Amazon", "Facebook", "Tesla", "Apple", "AmazonASFASFAS", "Google"]
-        for i in arr1 {
-            let butt = UIButton(configuration: UIButton.Configuration.outline())
+        for (index, text) in searchedCompanies.enumerated() {
+            guard let text = text else { continue }
             
-            butt.addTarget(self, action: #selector(tickerButtonPressed), for: .touchUpInside)
+            let butt = createButton(title: text)
             
-            if let font = UIFont(name: "Montserrat-SemiBold", size: 15) {
-                butt.setAttributedTitle(NSAttributedString(string: i, attributes: [NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: font]), for: .normal)
+            if index < 7 {
+                firstStack.addArrangedSubview(butt)
+            } else {
+                secondStack.addArrangedSubview(butt)
             }
-            
-            butt.heightAnchor.constraint(equalToConstant: 50).isActive = true
-            secondStack.addArrangedSubview(butt)
         }
-        
         
         verticalStack.addArrangedSubview(firstStack)
         verticalStack.addArrangedSubview(secondStack)
         
-        let inset:CGFloat = 40
-        verticalStack.widthAnchor.constraint(greaterThanOrEqualTo: scrollView.widthAnchor, constant: -inset*2).isActive = true
+        let inset: CGFloat = 40
+        verticalStack.widthAnchor.constraint(greaterThanOrEqualTo: scrollView.widthAnchor, constant: -inset * 2).isActive = true
+    }
+    
+    private func createButton(title: String) -> UIButton {
+        let butt = UIButton(configuration: UIButton.Configuration.outline())
         
+        butt.addTarget(self, action: #selector(tickerButtonPressed), for: .touchUpInside)
+        
+        if let font = UIFont(name: "Montserrat-SemiBold", size: 15) {
+            butt.setAttributedTitle(NSAttributedString(string: title, attributes: [NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: font]), for: .normal)
+        }
+        
+        butt.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        return butt
     }
     
     private func setLabelTitle(text: String) {
@@ -154,8 +173,7 @@ final class SearchHistoryView: UIView {
     
     @objc private func tickerButtonPressed(sender: UIButton!) {
         if let ticker = sender.currentAttributedTitle?.string {
-            searchedCompany = ticker
-//            didTap(ticker)
+            delegate?.didTapOnButton(text: ticker)
         }
     }
 }

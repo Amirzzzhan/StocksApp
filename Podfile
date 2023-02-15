@@ -8,6 +8,7 @@ target 'Stocks App' do
   # Pods for Stocks App
   pod 'Alamofire'
   pod 'SDWebImageSVGNativeCoder'
+  pod "SwiftChart"
 
   target 'Stocks AppTests' do
     inherit! :search_paths

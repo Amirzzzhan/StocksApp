@@ -18,7 +18,7 @@ final class NavigationSearchBarView: UIView {
         search.placeholder = "Find a company or ticker"
         search.layer.borderColor = UIColor.black.cgColor
         search.layer.borderWidth = 1.2
-        search.layer.cornerRadius = 28
+        search.layer.cornerRadius = 22 // 28
         search.setImage(UIImage(named: "Glass"), for: .search, state: .normal)
         search.setImage(UIImage(named: "Cross"), for: .clear, state: .normal)
         search.setPositionAdjustment(UIOffset(horizontal: 15, vertical: 0), for: .search)
@@ -53,7 +53,7 @@ final class NavigationSearchBarView: UIView {
         self.addSubview(search)
         search.addSubview(leftButton)
         
-        setupConstraints() 
+        setupConstraints()
     }
     
     private func setupConstraints() {
@@ -61,7 +61,9 @@ final class NavigationSearchBarView: UIView {
             [
                 search.leftAnchor.constraint(equalTo: self.leftAnchor),
                 search.rightAnchor.constraint(equalTo: self.rightAnchor),
-                search.heightAnchor.constraint(equalToConstant: 55),
+                search.topAnchor.constraint(equalTo: self.topAnchor),
+                search.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+//                search.heightAnchor.constraint(equalToConstant: 50),
                 
                 leftButton.leftAnchor.constraint(equalTo: search.leftAnchor, constant: 20),
                 leftButton.centerYAnchor.constraint(equalTo: search.centerYAnchor),

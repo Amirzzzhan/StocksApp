@@ -35,8 +35,36 @@ final class CoreDataManager {
             return []
         }
     }
+
+    func getSearchedTexts() -> [SearchHistory] {
+        let request = NSFetchRequest<SearchHistory>(entityName: "SearchHistory")
+
+        do {
+            return try viewContext.fetch(request)
+        } catch {
+            return []
+        }
+    }
     
-    func addStock(stock: Stock) {
+    private func freeSearchedTexts() {
+        let searchedTexts = getSearchedTexts()
+        
+        if let searchedText = searchedTexts.first {
+            deleteSearchedText(text: searchedText)
+        }
+    }
+    
+    func addSearchedText(text: String) {
+        if getSearchedTexts().count == 14 {
+            freeSearchedTexts()
+        }
+        
+        let searchedText = SearchHistory(context: CoreDataManager.shared.viewContext)
+        searchedText.text = text
+        saveUpdates()
+    }
+    
+    func saveUpdates() {
         saveChanges()
     }
     
@@ -66,6 +94,24 @@ final class CoreDataManager {
     
     func deleteStock(stock: Stock) {
         viewContext.delete(stock)
+        
+        saveChanges()
+    }
+    
+    func deleteSearchedText(text: SearchHistory) {
+        viewContext.delete(text)
+        
+        saveChanges()
+    }
+    
+    func clearStorage() {
+        for stock in getStocks() {
+            deleteStock(stock: stock)
+        }
+        
+        for searchedText in getSearchedTexts() {
+            deleteSearchedText(text: searchedText)
+        }
         
         saveChanges()
     }

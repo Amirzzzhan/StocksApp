@@ -179,12 +179,14 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SDWebImageSVGNativeCoder/SDWebImageSVGNativeCoder.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SwiftChart/SwiftChart.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/svgnative/svgnative.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SDWebImageSVGNativeCoder/SDWebImageSVGNativeCoder.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SwiftChart/SwiftChart.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/svgnative/svgnative.framework"
 fi
 if [ "${COCOAPODS_PARALLEL_CODE_SIGN}" == "true" ]; then

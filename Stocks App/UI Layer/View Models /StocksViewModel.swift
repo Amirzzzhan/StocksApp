@@ -12,13 +12,14 @@ import UIKit
 final class StocksViewModel: ObservableObject {
     
     private let tickers: [String] = ["AAPL", "AMZN", "MSFT", "GOOGL", "META", "UNH", "JNJ", "JPM", "V", "PG","XOM","HD", "CVX", "ABBV", "PFE", "AVGO", "COST", "DIS", "F", "CCL", "NIO", "TSLA", "COIN"]
-    //    "ABEV"
     
     private var isFavouriteScreen: Bool = false
     
     @Published private(set) var stocks: [Stock] = []
-//    @Published private(set) var favo stocks: [Stock] = []
+    
     @Published private(set) var filteredStocks: [Stock] = []
+    
+    @Published private(set) var historicalData: [HistoricalData] = []
     
     private let api: StocksApiLogic
     
@@ -39,7 +40,25 @@ final class StocksViewModel: ObservableObject {
             return (ticker.lowercased().contains(text.lowercased()) ||
                     companyName.lowercased().contains(text.lowercased()))
         })
-
+        
+    }
+    
+    func getPriceHistory(ticker: String, range: String) {
+        api.getHistoricalData(ticker: ticker, range: range) { result in
+            switch result {
+                
+            case .success(let priceHistory):
+                
+                if let priceHistory = priceHistory {
+                    self.historicalData = priceHistory
+                }
+                
+            case .failure(let error):
+                
+                print(error.localizedDescription)
+                
+            }
+        }
     }
     
     func getStocks() {
@@ -77,10 +96,10 @@ final class StocksViewModel: ObservableObject {
                 }
             }
             
-//            if isFiltering {
-//                guard let text = text else { return }
-//                self.searchStocks(text: text)
-//            }
+            //            if isFiltering {
+            //                guard let text = text else { return }
+            //                self.searchStocks(text: text)
+            //            }
         }
         
     }
