@@ -1,7 +1,0 @@
-.DS_Store
-svgnative/build/
-viewer/
-.vscode
-SVGNativeViewerLib.pc
-svgnative/out
-.vs

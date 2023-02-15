@@ -342,6 +342,8 @@ final class InfoPageVC: UIViewController {
             ]
         )
     }
+    
+    
 }
 
 

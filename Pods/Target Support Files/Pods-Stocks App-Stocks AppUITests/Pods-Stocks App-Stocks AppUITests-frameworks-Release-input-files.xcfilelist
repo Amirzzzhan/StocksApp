@@ -1,6 +1,0 @@
-${PODS_ROOT}/Target Support Files/Pods-Stocks App-Stocks AppUITests/Pods-Stocks App-Stocks AppUITests-frameworks.sh
-${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework
-${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework
-${BUILT_PRODUCTS_DIR}/SDWebImageSVGNativeCoder/SDWebImageSVGNativeCoder.framework
-${BUILT_PRODUCTS_DIR}/SwiftChart/SwiftChart.framework
-${BUILT_PRODUCTS_DIR}/svgnative/svgnative.framework
